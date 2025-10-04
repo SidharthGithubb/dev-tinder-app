@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-
+const validator = require('validator');
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        minlength: 4,
+        minlength: 3,
         maxlength: 30,
         required: [true, "First name is required"]
     },
@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         lowercase: true,
         trim: true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("Email ID is not valid");
+            }
+        },
         required: [true, "Email ID is required"],
         unique: true
     },
