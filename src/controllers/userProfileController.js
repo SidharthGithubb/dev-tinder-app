@@ -4,7 +4,7 @@ const User = require('../models/userModel');
 //Private
 const updateUserProfile = async (req,res) => {
     try {
-        const userId = req.params?.userId;
+        const userId = req.user._id; //From token
         const ALLOWED_UPDATES = ['age','gender','bio', 'skill'];
         const isUpdateAllowed = Object.keys(req.body).every((k)=>{
            return ALLOWED_UPDATES.includes(k);
