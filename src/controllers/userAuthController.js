@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 //DESC Register a new user
 //POST /api/users/register
 //Public
@@ -31,31 +32,34 @@ const registerUser = async (req, res) => {
     }   
 }
 
-//DESC Upate user profile
-//PUT /api/users/profile
-//Private
-const updateUserProfile = async (req,res) => {
+//DESC Login user
+//POST /api/users/login
+//Public
+const loginUser = async (req,res) => {
     try {
-        const userId = req.params?.userId;
-        const ALLOWED_UPDATES = ['age','gender','bio', 'skill'];
-        const isUpdateAllowed = Object.keys(req.body).every((k)=>{
-           return ALLOWED_UPDATES.includes(k);
-        });
-
-        if(!isUpdateAllowed){
-            throw new Error("Update not allowed");
+        const {emailId, password} = req.body;
+        if(!emailId || !password){
+            return res.status(400).json({message: "Please provide email and password"});
         }
-        const user = await User.findById(userId);
-        console.log(user);
+        const user = await User.findOne({emailId});
         if(!user){
-            return res.status(404).json({message: "User not found"});
+            return res.status(400).json({message: "User not registered"});
         }
-        
-        const updatedUser = await User.findByIdAndUpdate(userId, req.body, {new: true, runValidators: true});
-        res.status(200).json({message: "User profile updated successfully", user: updatedUser});
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        if(!isPasswordMatch){
+            return res.status(400).json({message: "Invalid Password"});
+        }
+        else{
+            //Generate JWT token
+            const token = jwt.sign({_id: user._id, emailId: user.emailId, fullname: user.firstName+" "+user.lastName}, process.env.JWT_SECRET, {expiresIn: '1h'});
+            res.cookie("token", token,{expiresIn: '1h'});
+            res.status(200).json({message: "User logged in successfully"});
+        }
     } catch (error) {
-        res.status(500).json({message: "Error updating user profile", error: error.message});
+        res.status(500).json({message: "Error logging in user", error: error.message});
     }
 }
 
-module.exports = {registerUser, updateUserProfile};
+
+
+module.exports = {registerUser,loginUser};
