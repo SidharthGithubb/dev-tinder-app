@@ -21,8 +21,8 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        minlength: 6,
-        maxlength: 15,
+        //minlength: 6,
+        //maxlength: 15,
         required: [true, "Password is required"]
     },
     age: {
@@ -44,9 +44,7 @@ const userSchema = new mongoose.Schema({
         maxlength: 250
     },
     skill: {
-        type: String,
-        enum: ["JavaScript", "Python", "Java", "C++", "Ruby", "Go", "PHP", "C#", "TypeScript", "Swift", "Kotlin", "Rust", "Dart", "Scala", "Perl", "Haskell", "Lua", "Elixir", "Clojure", "Erlang"],
-        default: "JavaScript"
+        type: [String]
     }
 }, {
     timestamps: true
