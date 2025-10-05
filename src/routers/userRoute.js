@@ -1,12 +1,21 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {registerUser, loginUser} = require('../controllers/userAuthController');
-const {updateUserProfile} = require('../controllers/userProfileController');
-const tokenValidator = require('../middlewares/tokenValidator');
+const {
+  registerUser,
+  loginUser,
+} = require("../controllers/userAuthController");
+const {
+  getUserProfile,
+  updateUserProfile,
+  deleteUserProfile,
+} = require("../controllers/userProfileController");
+const tokenValidator = require("../middlewares/tokenValidator");
 
 //Public routes
-router.post('/register', registerUser);
-router.post('/login', loginUser);
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 //Private routes
-router.patch('/update-profile', tokenValidator, updateUserProfile);
+router.get("/profile", tokenValidator, getUserProfile);
+router.patch("/update-profile", tokenValidator, updateUserProfile);
+router.delete("/delete-profile", tokenValidator, deleteUserProfile);
 module.exports = router;
