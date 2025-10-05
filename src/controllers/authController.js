@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 //DESC Register a new user
 //POST /api/users/register
 //Public
-const registerUser = async (req, res) => {
+const signupUser = async (req, res) => {
   try {
     const {
       firstName,
@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
     } else {
       //Generate JWT token
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: new Date(Date.now() + 15 * 60 * 1000),
+        expiresIn: "15m",
       });
       res.cookie("token", token, { expires: new Date(Date.now() + 15 * 60 * 1000), httpOnly: true });
       res.status(200).json({ message: "User logged in successfully" });
@@ -86,4 +86,17 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+//DESC Logout user
+//POST /api/users/logout
+//Public
+const logoutUser = async (req, res) => {
+  try {
+    res.clearCookie("token"); // Clear the token cookie
+    res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error logging out user", error: error.message });
+  }
+};
+module.exports = { signupUser, loginUser, logoutUser };
