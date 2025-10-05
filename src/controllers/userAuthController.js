@@ -57,6 +57,13 @@ const loginUser = async (req, res) => {
     if (!emailId || !password) {
       throw new Error("Please provide email and password");
     }
+    const ALLOWED_FIELDS = ["emailId", "password"];
+    const isCalidRequest = Object.keys(req.body).every((k) =>{
+        return ALLOWED_FIELDS.includes(k);
+    })
+    if(!isCalidRequest){
+        throw new Error("Invalid request");
+    }
     const user = await User.findOne({ emailId });
     if (!user) {
       throw new Error("User not registered");
@@ -69,7 +76,7 @@ const loginUser = async (req, res) => {
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
-      res.cookie("token", token, { expiresIn: "1h" });
+      res.cookie("token", token, { expiresIn: "15m" });
       res.status(200).json({ message: "User logged in successfully" });
     }
   } catch (error) {
