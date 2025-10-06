@@ -57,6 +57,15 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    photoUrl: {
+      type: [String],
+      default: "",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Photo URL is not valid");
+        }
+      },
+    },
   },
   {
     timestamps: true,

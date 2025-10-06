@@ -27,17 +27,20 @@ const signupUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = await User.create({
-      firstName,
-      lastName,
-      emailId,
-      password: hashedPassword,
-      age,
-      gender,
-      bio,
-      skill,
-      role,
-    });
+    const newUser = await User.create(
+      {
+        firstName,
+        lastName,
+        emailId,
+        password: hashedPassword,
+        age,
+        gender,
+        bio,
+        skill,
+        role,
+      },
+      { new: true, runValidators: true }
+    );
     res
       .status(201)
       .json({ message: "User registered successfully", user: newUser });
@@ -58,11 +61,11 @@ const loginUser = async (req, res) => {
       throw new Error("Please provide email and password");
     }
     const ALLOWED_FIELDS = ["emailId", "password"];
-    const isCalidRequest = Object.keys(req.body).every((k) =>{
-        return ALLOWED_FIELDS.includes(k);
-    })
-    if(!isCalidRequest){
-        throw new Error("Invalid request");
+    const isCalidRequest = Object.keys(req.body).every((k) => {
+      return ALLOWED_FIELDS.includes(k);
+    });
+    if (!isCalidRequest) {
+      throw new Error("Invalid request");
     }
     const user = await User.findOne({ emailId });
     if (!user) {
@@ -76,7 +79,10 @@ const loginUser = async (req, res) => {
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "15m",
       });
-      res.cookie("token", token, { expires: new Date(Date.now() + 15 * 60 * 1000), httpOnly: true });
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 15 * 60 * 1000),
+        httpOnly: true,
+      });
       res.status(200).json({ message: "User logged in successfully" });
     }
   } catch (error) {

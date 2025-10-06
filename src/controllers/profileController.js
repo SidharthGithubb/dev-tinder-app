@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 //DESC Get User Profile
 //GET /api/users/profile
 //Private
-const getUserProfile = async (req, res) => {
+const viewUserProfile = async (req, res) => {
   try {
     const userId = req.user._id; //From token
     const user = await User.findById(userId).select("-password");
@@ -25,17 +25,18 @@ const getUserProfile = async (req, res) => {
 //DESC Update user profile
 //PUT /api/users/profile
 //Private
-const updateUserProfile = async (req, res) => {
+const editUserProfile = async (req, res) => {
   try {
     const userId = req.user._id; //From token
-    const ALLOWED_UPDATES = ["age", "gender", "bio", "skill", "role"];
-    const isUpdateAllowed = Object.keys(req.body).every((k) => {
-      return ALLOWED_UPDATES.includes(k);
+    const ALLOWED_EDIT_FIELDS = ["firstName", "lastName", "age", "gender", "bio", "skill", "role", "photoUrl"];
+    const isEditAllowed = Object.keys(req.body).every((k) => {
+      return ALLOWED_EDIT_FIELDS.includes(k);
     });
 
-    if (!isUpdateAllowed) {
+    if (!isEditAllowed) {
       throw new Error("Update not allowed");
     }
+
     const user = await User.findById(userId);
     if (!user) {
       throw new Error("User not found");
@@ -75,4 +76,4 @@ const deleteUserProfile = async (req, res) => {
       .json({ message: "Error deleting user profile", error: error.message });
   }
 };
-module.exports = { getUserProfile, updateUserProfile, deleteUserProfile };
+module.exports = { viewUserProfile, editUserProfile, deleteUserProfile };
