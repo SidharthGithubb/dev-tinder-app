@@ -37,12 +37,16 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
+      enum:{
+        values: ["male", "female", "other"],
+        message: '{VALUE} is not supported'
+      }
       // This method will validate the condition only when a new record/object is created.
-      validate(value) {
-        if (!["male", "female", "other"].includes(value.toLowerCase())) {
-          throw new Error("Gender data is not valid");
-        }
-      },
+      // validate(value) {
+      //   if (!["male", "female", "other"].includes(value.toLowerCase())) {
+      //     throw new Error("Gender data is not valid");
+      //   }
+      // },
     },
     bio: {
       type: String,
@@ -56,6 +60,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "admin"],
       default: "user",
+    },
+    photoUrl: {
+      type: String,
+      default: "",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Photo URL is not valid");
+        }
+      },
     },
   },
   {

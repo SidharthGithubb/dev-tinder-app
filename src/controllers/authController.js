@@ -1,10 +1,11 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { validateSignUpData, validateLoginData } = require("../utils/validations");
 //DESC Register a new user
-//POST /api/users/register
+//POST /api/signup
 //Public
-const registerUser = async (req, res) => {
+const signupUser = async (req, res) => {
   try {
     const {
       firstName,
@@ -16,10 +17,11 @@ const registerUser = async (req, res) => {
       bio,
       skill,
       role,
+      photoUrl
     } = req.body;
-    if (!firstName || !lastName || !emailId || !password) {
-      throw new Error("Please provide the mandatory fields");
-    }
+
+    validateSignUpData(req);
+
     const existingUser = await User.findOne({ emailId });
     if (existingUser) {
       throw new Error("User already exists");
@@ -27,17 +29,20 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = await User.create({
-      firstName,
-      lastName,
-      emailId,
-      password: hashedPassword,
-      age,
-      gender,
-      bio,
-      skill,
-      role,
-    });
+    const newUser = await User.create(
+      {
+        firstName,
+        lastName,
+        emailId,
+        password: hashedPassword,
+        age,
+        gender,
+        bio,
+        skill,
+        role,
+        photoUrl
+      }
+    );
     res
       .status(201)
       .json({ message: "User registered successfully", user: newUser });
@@ -49,20 +54,18 @@ const registerUser = async (req, res) => {
 };
 
 //DESC Login user
-//POST /api/users/login
+//POST /api/login
 //Public
 const loginUser = async (req, res) => {
   try {
     const { emailId, password } = req.body;
-    if (!emailId || !password) {
-      throw new Error("Please provide email and password");
-    }
+    validateLoginData(req);
     const ALLOWED_FIELDS = ["emailId", "password"];
-    const isCalidRequest = Object.keys(req.body).every((k) =>{
-        return ALLOWED_FIELDS.includes(k);
-    })
-    if(!isCalidRequest){
-        throw new Error("Invalid request");
+    const isCalidRequest = Object.keys(req.body).every((k) => {
+      return ALLOWED_FIELDS.includes(k);
+    });
+    if (!isCalidRequest) {
+      throw new Error("Invalid request");
     }
     const user = await User.findOne({ emailId });
     if (!user) {
@@ -74,9 +77,12 @@ const loginUser = async (req, res) => {
     } else {
       //Generate JWT token
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: new Date(Date.now() + 15 * 60 * 1000),
+        expiresIn: "15m",
       });
-      res.cookie("token", token, { expires: new Date(Date.now() + 15 * 60 * 1000), httpOnly: true });
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 15 * 60 * 1000),
+        httpOnly: true,
+      });
       res.status(200).json({ message: "User logged in successfully" });
     }
   } catch (error) {
@@ -86,4 +92,17 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+//DESC Logout user
+//POST /api/logout
+//Public
+const logoutUser = async (req, res) => {
+  try {
+    res.clearCookie("token"); // Clear the token cookie
+    res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error logging out user", error: error.message });
+  }
+};
+module.exports = { signupUser, loginUser, logoutUser };
