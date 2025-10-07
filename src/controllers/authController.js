@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { validateSignUpData, validateLoginData } = require("../utils/validations");
 //DESC Register a new user
 //POST /api/users/register
 //Public
@@ -17,9 +18,9 @@ const signupUser = async (req, res) => {
       skill,
       role,
     } = req.body;
-    if (!firstName || !lastName || !emailId || !password) {
-      throw new Error("Please provide the mandatory fields");
-    }
+
+    validateSignUpData(req);
+
     const existingUser = await User.findOne({ emailId });
     if (existingUser) {
       throw new Error("User already exists");
@@ -57,9 +58,7 @@ const signupUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { emailId, password } = req.body;
-    if (!emailId || !password) {
-      throw new Error("Please provide email and password");
-    }
+    validateLoginData(req);
     const ALLOWED_FIELDS = ["emailId", "password"];
     const isCalidRequest = Object.keys(req.body).every((k) => {
       return ALLOWED_FIELDS.includes(k);
