@@ -10,6 +10,6 @@ const tokenValidator = require("../middlewares/tokenValidator");
 //Private routes
 profileRouter.get("/profile/view", tokenValidator, viewUserProfile);
 profileRouter.patch("/profile/edit", tokenValidator, editUserProfile);
-profileRouter.delete("/delete-profile", tokenValidator, deleteUserProfile);
+profileRouter.delete("/profile/delete", tokenValidator, deleteUserProfile);
 
 module.exports = profileRouter;

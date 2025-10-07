@@ -1,7 +1,7 @@
 const User = require("../models/userModel");
 
 //DESC Get User Profile
-//GET /api/users/profile
+//GET /api/profile/view
 //Private
 const viewUserProfile = async (req, res) => {
   try {
@@ -23,7 +23,7 @@ const viewUserProfile = async (req, res) => {
   }
 };
 //DESC Update user profile
-//PUT /api/users/profile
+//PUT /api/profile/edit
 //Private
 const editUserProfile = async (req, res) => {
   try {
@@ -59,7 +59,7 @@ const editUserProfile = async (req, res) => {
   }
 };
 //DESC Delete user profile
-//DELETE /api/users/profile
+//DELETE /api/profile/delete
 //Private
 const deleteUserProfile = async (req, res) => {
   try {
@@ -76,4 +76,23 @@ const deleteUserProfile = async (req, res) => {
       .json({ message: "Error deleting user profile", error: error.message });
   }
 };
+
+//DESC Forgot password
+//POST /forgot-password
+//Public
+const forgotPassword = async (req, res) => {
+  try {
+    const { emailId } = req.body;
+    const user = await User.findOne({emailId});
+    if(!user) {
+      throw new Error("User not found");
+    }
+    
+    //Generate OTP and send email
+
+
+  } catch (error) {
+    
+  }
+}
 module.exports = { viewUserProfile, editUserProfile, deleteUserProfile };

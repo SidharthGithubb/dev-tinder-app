@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validateSignUpData, validateLoginData } = require("../utils/validations");
 //DESC Register a new user
-//POST /api/users/register
+//POST /api/signup
 //Public
 const signupUser = async (req, res) => {
   try {
@@ -17,6 +17,7 @@ const signupUser = async (req, res) => {
       bio,
       skill,
       role,
+      photoUrl
     } = req.body;
 
     validateSignUpData(req);
@@ -39,8 +40,8 @@ const signupUser = async (req, res) => {
         bio,
         skill,
         role,
-      },
-      { new: true, runValidators: true }
+        photoUrl
+      }
     );
     res
       .status(201)
@@ -53,7 +54,7 @@ const signupUser = async (req, res) => {
 };
 
 //DESC Login user
-//POST /api/users/login
+//POST /api/login
 //Public
 const loginUser = async (req, res) => {
   try {
@@ -92,7 +93,7 @@ const loginUser = async (req, res) => {
 };
 
 //DESC Logout user
-//POST /api/users/logout
+//POST /api/logout
 //Public
 const logoutUser = async (req, res) => {
   try {
