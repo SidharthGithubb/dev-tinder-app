@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const tokenValidator = (req, res, next) => {
+const User = require("../models/userModel");
+const tokenValidator = async (req, res, next) => {
   try {
     const token = req.cookies.token || "";
     if (!token) {
@@ -10,7 +11,13 @@ const tokenValidator = (req, res, next) => {
     if (!decoded) {
       throw new Error("Invalid token");
     }
-    req.user = decoded;
+    //Fetch user details from DB
+    const user = await User.findById(decoded._id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    //Attach user to request object
+    req.user = user;
     next();
   } catch (error) {
     res

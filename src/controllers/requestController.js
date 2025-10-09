@@ -2,7 +2,9 @@ const ConnectionRequest = require("../models/connectionRequestModel");
 const User = require("../models/userModel");
 const sendRequest = async (req, res) => {
   try {
-    const fromUserId = req.user._id;
+    const fromUser = req.user; //From token
+    // Extract fromUserId from the token (req.user) and toUserId & status from req.params
+    const fromUserId = fromUser._id;
     const toUserId = req.params.toUserId;
     const status = req.params.status;
 
@@ -35,7 +37,7 @@ const sendRequest = async (req, res) => {
       res
         .status(201)
         .json({
-          message: "Connection request sent successfully",
+          message: `Connection request sent successfully from ${fromUser.firstName} to ${toUser.firstName} with status ${status}`,
           data: request,
         });
     } else {
@@ -44,7 +46,7 @@ const sendRequest = async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message:"error while sending a connection request", error: error.message });
   }
 };
 

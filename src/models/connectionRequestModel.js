@@ -21,4 +21,14 @@ const connectionRequestSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+//DB level Middleware to prevent sending request to oneself
+//This .pre hook will run before saving a document to the database
+connectionRequestSchema.pre("save", function (next) {
+  const connecionRequest = this;
+  if(connecionRequest.fromUserId.equals(connecionRequest.toUserId)) {
+    throw new Error("Cannot send connection request to oneself");
+  }
+  next();
+});
+
 module.exports = mongoose.model("ConnectionRequest", connectionRequestSchema);

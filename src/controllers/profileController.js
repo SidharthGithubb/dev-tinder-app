@@ -5,16 +5,12 @@ const User = require("../models/userModel");
 //Private
 const viewUserProfile = async (req, res) => {
   try {
-    const userId = req.user._id; //From token
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-      throw new Error("User not found");
-    }
+    const user = req.user; //From token
     if (user.role === "admin") {
       const allUsers = await User.find().select("-password");
       return res.status(200).json({ users: allUsers });
     } else {
-      res.status(200).json({ user });
+      res.status(200).json(user);
     }
   } catch (error) {
     res
@@ -27,7 +23,7 @@ const viewUserProfile = async (req, res) => {
 //Private
 const editUserProfile = async (req, res) => {
   try {
-    const userId = req.user._id; //From token
+    const user = req.user; //From token
     const ALLOWED_EDIT_FIELDS = ["firstName", "lastName", "age", "gender", "bio", "skill", "role", "photoUrl"];
     const isEditAllowed = Object.keys(req.body).every((k) => {
       return ALLOWED_EDIT_FIELDS.includes(k);
@@ -37,12 +33,7 @@ const editUserProfile = async (req, res) => {
       throw new Error("Update not allowed");
     }
 
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+    const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -63,12 +54,8 @@ const editUserProfile = async (req, res) => {
 //Private
 const deleteUserProfile = async (req, res) => {
   try {
-    const userId = req.user._id; //From token
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
-    await User.findByIdAndDelete(userId);
+    const user = req.user; //From token
+    await User.findByIdAndDelete(user_id);
     res.status(200).json({ message: "User profile deleted successfully" });
   } catch (error) {
     res
