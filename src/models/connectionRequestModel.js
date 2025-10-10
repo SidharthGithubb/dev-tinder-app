@@ -21,6 +21,8 @@ const connectionRequestSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 }, { unique: true });
+
 //DB level Middleware to prevent sending request to oneself
 //This .pre hook will run before saving a document to the database
 connectionRequestSchema.pre("save", function (next) {
