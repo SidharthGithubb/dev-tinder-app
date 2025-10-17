@@ -13,10 +13,10 @@ profileRouter
 connectionRouter
 - POST /request/send/interested/:userId - Done
 - POST /request/send/ignored/:userId -Done
-- POST /request/review/accepted/:requestId
-- POST /request/review/rejected/:requestId
+- POST /request/review/accepted/:requestId - Done
+- POST /request/review/rejected/:requestId - Done
 
 userRouter
-- GET /user/connections
-- GET /user/requests/received
+- GET /user/connections - Done
+- GET /user/requests/received - Done
 - GET /user/feed - Gets you the profile of other users on platform

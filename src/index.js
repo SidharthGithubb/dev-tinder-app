@@ -12,8 +12,9 @@ const port = process.env.PORT || 7778;
 const authRouter = require("./routers/authRouter");
 const profileRouter = require("./routers/profileRouter");
 const requestRouter = require("./routers/requestRouter");
+const userRouter = require("./routers/userRouter");
 
-app.use("/api", authRouter, profileRouter, requestRouter);
+app.use("/api", authRouter, profileRouter, requestRouter, userRouter);
 
 connectDB()
   .then((conn) => {
