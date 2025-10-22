@@ -40,9 +40,16 @@ const getAllConnectionsForUser = async (req, res) => {
                 {fromUserId : loggedInUser._id, status: "accepted"},
                 {toUserId : loggedInUser._id, status: "accepted"},
             ]
-        }).populate("fromUserId", ["firstName", "lastName", "emailId", "profileImage"]);
+        }).populate("fromUserId", ["firstName", "lastName", "emailId", "profileImage"])
+        .populate("toUserId", ["firstName", "lastName", "emailId", "profileImage"]);
         
-        const connections = allConnections.map(connection => connection.fromUserId);
+        const connections = allConnections.map((row) => {
+            if(row.fromUserId._id.equals(loggedInUser._id)) {
+                return row.toUserId;
+            } else {
+                return row.fromUserId;
+            }
+        })
         
         res.status(200).json({
             message: "Connections fetched successfully",
@@ -56,4 +63,20 @@ const getAllConnectionsForUser = async (req, res) => {
     }
 }
 
-module.exports = { getAllRequestsForUser, getAllConnectionsForUser };
+//DESC Get feed for logged in user
+//METHOD: GET
+//ROUTE: /api/feed
+const feedController = async (req, res) => {
+  try {
+    //User should not see his own card in feed
+    //User shaould not see cards of users he has already sent connection requests to
+    //User Should not see cards of user he is already connected to
+    //User should not see cards of users he has rejected or ignored
+
+    
+    
+  } catch (error) {
+    
+  }
+}
+module.exports = { getAllRequestsForUser, getAllConnectionsForUser, feedController };
