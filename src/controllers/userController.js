@@ -68,15 +68,37 @@ const getAllConnectionsForUser = async (req, res) => {
 //ROUTE: /api/feed
 const feedController = async (req, res) => {
   try {
-    //User should not see his own card in feed
-    //User shaould not see cards of users he has already sent connection requests to
-    //User Should not see cards of user he is already connected to
-    //User should not see cards of users he has rejected or ignored
+    const loggedInUser = req.user;
 
+    //Find all connection requests (sent + received) for logged in user
+    const connectionsRequests = await ConnectionRequest.find({
+      $or: [{fromUserId: loggedInUser._id},
+        {toUserId: loggedInUser._id}]
+    }).select("fromUserId toUserId status")
+
+    const hideUsersFromFeed = new Set();
+    connectionsRequests.forEach((connection) => {
+      hideUsersFromFeed.add(connection.fromUserId.toString());
+      hideUsersFromFeed.add(connection.toUserId.toString());
+    });
+
+    //Also hide logged in user
+    hideUsersFromFeed.add(loggedInUser._id.toString());
     
-    
+    //Find all users except the ones in hideUsersFromFeed
+    const newConnections = await User.find({
+      _id: { $nin: Array.from(hideUsersFromFeed) }
+    }).select("firstName lastName emailId profileImage headline bio gender skill");
+
+    res.status(200).json({
+      message: "Feed fetched successfully",
+      data: newConnections,
+    });
   } catch (error) {
-    
+    res.status(500).json({
+      message: "error while fetching feed for user",
+      error: error.message,
+    });
   }
 }
 module.exports = { getAllRequestsForUser, getAllConnectionsForUser, feedController };
